@@ -187,3 +187,6 @@ resource "azurerm_windows_virtual_machine" "lab" {
     lab_attendee = "vm-${count.index + 1}"
   }
 }
+
+
+#test

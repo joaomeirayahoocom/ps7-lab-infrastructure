@@ -1,7 +1,7 @@
 variable "vm_count" {
   description = "Number of lab VMs to create. Change this to scale the lab up or down."
   type        = number
-  default     = 1
+  default     = 3
 }
 
 variable "admin_password" {

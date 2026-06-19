@@ -10,13 +10,13 @@ terraform {
 
 provider "azurerm" {
   features {
-      virtual_machine {
+    virtual_machine {
       skip_shutdown_and_force_delete = true
     }
     resource_group {
       prevent_deletion_if_contains_resources = false
     }
-    }
+  }
 }
 
 # ── Resource Group ────────────────────────────────────────
@@ -52,13 +52,52 @@ resource "azurerm_subnet" "lab" {
   default_outbound_access_enabled = false
 }
 
-# ── AzureBastionSubnet — required name, min /26 ───────────
+# ── AzureBastionSubnet ────────────────────────────────────
 resource "azurerm_subnet" "bastion" {
   name                 = "AzureBastionSubnet"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = ["10.20.2.0/26"]
   default_outbound_access_enabled = false
+}
+
+# ── NAT Gateway Public IP ─────────────────────────────────
+resource "azurerm_public_ip" "nat" {
+  name                = "pip-nat-lab"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    environment = "lab"
+    project     = "acclotlab"
+  }
+}
+
+# ── NAT Gateway ───────────────────────────────────────────
+resource "azurerm_nat_gateway" "nat" {
+  name                = "nat-acclotlab"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku_name            = "Standard"
+
+  tags = {
+    environment = "lab"
+    project     = "acclotlab"
+  }
+}
+
+# ── Associate NAT Gateway Public IP ──────────────────────
+resource "azurerm_nat_gateway_public_ip_association" "nat" {
+  nat_gateway_id       = azurerm_nat_gateway.nat.id
+  public_ip_address_id = azurerm_public_ip.nat.id
+}
+
+# ── Associate NAT Gateway with Lab Subnet ─────────────────
+resource "azurerm_subnet_nat_gateway_association" "lab" {
+  subnet_id      = azurerm_subnet.lab.id
+  nat_gateway_id = azurerm_nat_gateway.nat.id
 }
 
 # ── Bastion Public IP ─────────────────────────────────────
@@ -79,7 +118,7 @@ resource "azurerm_public_ip" "bastion" {
   }
 }
 
-# ── Bastion Standard with Shareable Links ────────────────
+# ── Bastion Standard with Shareable Links ─────────────────
 resource "azurerm_bastion_host" "bastion" {
   name                   = "bastion-acclotlab"
   location               = azurerm_resource_group.rg.location
@@ -87,7 +126,6 @@ resource "azurerm_bastion_host" "bastion" {
   sku                    = "Standard"
   shareable_link_enabled = true
   tunneling_enabled      = true
-  
 
   ip_configuration {
     name                 = "ipconfig1"
@@ -178,8 +216,15 @@ resource "azurerm_windows_virtual_machine" "lab" {
     version   = "latest"
   }
 
-  patch_mode               = "AutomaticByPlatform"
-  enable_automatic_updates = true
+  patch_mode                        = "AutomaticByPlatform"
+  enable_automatic_updates          = true
+  vm_agent_platform_updates_enabled = true
+
+  lifecycle {
+    ignore_changes = [
+      vm_agent_platform_updates_enabled
+    ]
+  }
 
   tags = {
     environment  = "lab"
@@ -187,6 +232,3 @@ resource "azurerm_windows_virtual_machine" "lab" {
     lab_attendee = "vm-${count.index + 1}"
   }
 }
-
-
-#test

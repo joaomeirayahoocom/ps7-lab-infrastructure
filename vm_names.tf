@@ -1,0 +1,36 @@
+# vm_names.tf — auto-generated VM name list
+locals {
+  vm_names = [
+    "jagat-bakshi",
+    "sunil-raina",
+    "nisha-singh",
+    "b-khan",
+    "sureshbabu-dogg",
+    "christian-schef",
+    "kirti-behera",
+    "avik-sarkar",
+    "tijil-kataria",
+    "rajesh-chelamas",
+    "emanuel-jauregu",
+    "claudio-acuna",
+    "jimena-ortega",
+    "christine-sesti",
+    "carlos-gonzalez",
+    "priti-prerna",
+    "amol-dagadkhair",
+    "shourya-rakshit",
+    "tomas-cordoba",
+    "dibya-karjee",
+    "vipin-negi",
+    "mahek-jhamb",
+    "kishor-gopi",
+    "amiel-villaflor",
+    "javier-bach",
+    "john-dadule",
+    "john-1",
+    "john-2",
+    "john-3",
+    "john-4",
+    "john-5"
+  ]
+}

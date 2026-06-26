@@ -126,6 +126,7 @@ resource "azurerm_bastion_host" "bastion" {
   sku                    = "Standard"
   shareable_link_enabled = true
   tunneling_enabled      = true
+  scale_units            = 7
 
   ip_configuration {
     name                 = "ipconfig1"
@@ -166,7 +167,7 @@ resource "azurerm_network_security_group" "lab" {
 # ── NIC per VM (loop) ─────────────────────────────────────
 resource "azurerm_network_interface" "lab" {
   count               = var.vm_count
-  name                = "nic-lab-vm-${count.index + 1}"
+  name                = "nic-${local.vm_names[count.index]}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -192,7 +193,7 @@ resource "azurerm_network_interface_security_group_association" "lab" {
 # ── Lab VMs (loop) ────────────────────────────────────────
 resource "azurerm_windows_virtual_machine" "lab" {
   count               = var.vm_count
-  name                = "lab-vm-${count.index + 1}"
+  name                = local.vm_names[count.index]
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_D2s_v5"
@@ -229,6 +230,6 @@ resource "azurerm_windows_virtual_machine" "lab" {
   tags = {
     environment  = "lab"
     project      = "acclotlab"
-    lab_attendee = "vm-${count.index + 1}"
+    lab_attendee = local.vm_names[count.index]
   }
 }

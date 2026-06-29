@@ -27,10 +27,14 @@ locals {
     "amiel-villaflor",
     "javier-bach",
     "john-dadule",
-    "john-1",
-    "john-2",
-    "john-3",
-    "john-4",
-    "john-5"
+    "janalyn-cortez",
+    "ruturaj-kumthek",
+    "nitin-kumar",
+    "archana-yadav",
+    "gowsica-gunasek",
+    "geetha-narra",
+    "hitendra-kapadi",
+    "rich-saavedra",
+    "facilitator-ws"
   ]
 }
